@@ -1,0 +1,1 @@
+Small demo for using the `<canvas>` element to make a game.

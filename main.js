@@ -19,7 +19,7 @@ function Player() {
     this.moveSpeed = 5;
 
     this.draw = function(ctx) {
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "#f1c40f";
         ctx.fillRect(this.x - this.size / 2,
                      this.y - this.size / 2,
                      this.size,

@@ -6,6 +6,8 @@ var HEIGHT = canvas.height;
 
 var input = [];
 
+var lastUpdate = Date.now();
+
 //Modulo fix
 function mod(n, m) {
     return ((n % m) + m) % m;
@@ -16,7 +18,8 @@ function Player() {
     this.y = HEIGHT / 2;
     this.size = 50;
 
-    this.moveSpeed = 5;
+    //In pixels per second
+    this.moveSpeed = 500;
 
     this.draw = function(ctx) {
         ctx.fillStyle = "#f1c40f";
@@ -26,11 +29,11 @@ function Player() {
                      this.size);
     }
 
-    this.move = function(input) {
-        if (input.w) plr.y -= plr.moveSpeed;
-        if (input.a) plr.x -= plr.moveSpeed;
-        if (input.s) plr.y += plr.moveSpeed;
-        if (input.d) plr.x += plr.moveSpeed;
+    this.move = function(dt, input) {
+        if (input.w) plr.y -= plr.moveSpeed * dt / 1000;
+        if (input.a) plr.x -= plr.moveSpeed * dt / 1000;
+        if (input.s) plr.y += plr.moveSpeed * dt / 1000;
+        if (input.d) plr.x += plr.moveSpeed * dt / 1000;
 
         plr.x = mod(plr.x, WIDTH);
         plr.y = mod(plr.y, HEIGHT);
@@ -63,7 +66,12 @@ function onKeyup(key) {
 
 (function renderFrame() {
     requestAnimationFrame(renderFrame);
-    plr.move(input);
+
+    var now = Date.now();
+    var dt = now - lastUpdate;
+    lastUpdate = now;
+    
+    plr.move(dt, input);
     ctx.clearRect(0, 0, WIDTH, canvas.height);
     plr.draw(ctx);
 }());

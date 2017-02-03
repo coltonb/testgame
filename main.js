@@ -20,7 +20,10 @@ function Player() {
 
     this.draw = function(ctx) {
         ctx.fillStyle = "blue";
-        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.fillRect(this.x - this.size / 2,
+                     this.y - this.size / 2,
+                     this.size,
+                     this.size);
     }
 
     this.move = function(input) {

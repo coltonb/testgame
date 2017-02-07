@@ -11,6 +11,7 @@ var lastUpdate = Date.now();
 
 var screenShake = 0;
 
+//Hacky fix for sound to work on github page
 const soundPath = "https://raw.githubusercontent.com/coltonb/testgame/master/assets/sound/";
 
 var shootsfx = new Audio(soundPath + "shoot.wav");

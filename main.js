@@ -11,7 +11,7 @@ var lastUpdate = Date.now();
 
 var screenShake = 0;
 
-const soundPath = "https://raw.githubusercontent.com/coltonb/testgame/master/assets/sounds/";
+const soundPath = "https://raw.githubusercontent.com/coltonb/testgame/master/assets/sound/";
 
 var shootsfx = new Audio(soundPath + "shoot.wav");
 var hitsfx = new Audio(soundPath + "hit.wav");

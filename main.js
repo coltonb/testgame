@@ -11,6 +11,11 @@ var lastUpdate = Date.now();
 
 var screenShake = 0;
 
+const soundPath = "assets/sound/";
+
+var shootsfx = new Audio(soundPath + "shoot.wav");
+var hitsfx = new Audio(soundPath + "hit.wav");
+
 //Modulo fix
 function mod(n, m) {
     return ((n % m) + m) % m;
@@ -49,6 +54,7 @@ function Bullet(x, y, dir) {
 
         if (this.lifeTime <= 0) {
             this.active = false;
+            hitsfx.play();
             screenShake += 7;
         }
     }
@@ -83,15 +89,19 @@ function Player() {
         if (input.ArrowUp) {
             objects.push(new Bullet(this.x, this.y, 0));
             this.cd = 500;
+            shootsfx.play();
         } else if (input.ArrowLeft) {
             objects.push(new Bullet(this.x, this.y, 1));
             this.cd = 500;
+            shootsfx.play();
         } else if (input.ArrowDown) {
             objects.push(new Bullet(this.x, this.y, 2));
             this.cd = 500;
+            shootsfx.play();
         } else if (input.ArrowRight) {
             objects.push(new Bullet(this.x, this.y, 3));
             this.cd = 500;
+            shootsfx.play();
         }
     }
 

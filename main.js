@@ -9,6 +9,8 @@ var objects = [];
 
 var lastUpdate = Date.now();
 
+var screenShake = 0;
+
 //Modulo fix
 function mod(n, m) {
     return ((n % m) + m) % m;
@@ -17,10 +19,14 @@ function mod(n, m) {
 function Bullet(x, y, dir) {
     this.x = x;
     this.y = y;
-    this.size = 20;
+    this.size = 15;
     
     this.moveDir = dir;
     this.moveSpeed = 0.6;
+
+    this.lifeTime = 666;
+
+    this.active = true;
 
     this.draw = function(ctx) {
         ctx.fillStyle = '#'+Math.floor(Math.random()*16777215).toString(16);
@@ -30,7 +36,7 @@ function Bullet(x, y, dir) {
                      this.size);
     }
 
-    this.move = function(dt) {
+    this.update = function(dt) {
         if (this.moveDir == 0) this.y -= this.moveSpeed * dt;
         if (this.moveDir == 1) this.x -= this.moveSpeed * dt;
         if (this.moveDir == 2) this.y += this.moveSpeed * dt;
@@ -38,26 +44,27 @@ function Bullet(x, y, dir) {
 
         this.x = mod(this.x, WIDTH);
         this.y = mod(this.y, HEIGHT);
-    }
 
-    setTimeout(function() {
-        var index = objects.indexOf(this);
-        console.log(objects, 1);
-        if (index != -1) {
-            objects.splice(index, 1);
+        this.lifeTime -= dt;
+
+        if (this.lifeTime <= 0) {
+            this.active = false;
+            screenShake += 7;
         }
-    }, 1000);
+    }
 
 }
 
 function Player() {
     this.x = WIDTH / 2;
     this.y = HEIGHT / 2;
-    this.size = 50;
+    this.size = 33;
     this.cd = 0;
 
     //In pixels per second
     this.moveSpeed = 0.5;
+
+    this.active = true;    
 
     this.draw = function(ctx) {
         ctx.fillStyle = "#f1c40f";
@@ -67,7 +74,7 @@ function Player() {
                      this.size);
     }
 
-    this.shoot = function(dt, input) {
+    this.shoot = function(dt) {
         if (this.cd > 0) {
             this.cd -= dt;
             return;
@@ -75,39 +82,34 @@ function Player() {
 
         if (input.ArrowUp) {
             objects.push(new Bullet(this.x, this.y, 0));
-            //this.cd = 500;
-            return;
-        }
-        if (input.ArrowLeft) {
+            this.cd = 500;
+        } else if (input.ArrowLeft) {
             objects.push(new Bullet(this.x, this.y, 1));
-            //this.cd = 500;
-            return;
-        }
-        if (input.ArrowDown) {
+            this.cd = 500;
+        } else if (input.ArrowDown) {
             objects.push(new Bullet(this.x, this.y, 2));
-            //this.cd = 500;
-            return;
-        }
-        if (input.ArrowRight) {
+            this.cd = 500;
+        } else if (input.ArrowRight) {
             objects.push(new Bullet(this.x, this.y, 3));
-            //this.cd = 500;
-            return;
+            this.cd = 500;
         }
     }
 
-    this.move = function(dt, input) {
-        if (input.w) plr.y -= plr.moveSpeed * dt;
-        if (input.a) plr.x -= plr.moveSpeed * dt;
-        if (input.s) plr.y += plr.moveSpeed * dt;
-        if (input.d) plr.x += plr.moveSpeed * dt;
+    this.update = function(dt) {
+        if (input.w) this.y -= this.moveSpeed * dt;
+        if (input.a) this.x -= this.moveSpeed * dt;
+        if (input.s) this.y += this.moveSpeed * dt;
+        if (input.d) this.x += this.moveSpeed * dt;
 
-        plr.x = mod(plr.x, WIDTH);
-        plr.y = mod(plr.y, HEIGHT);
+        this.x = mod(this.x, WIDTH);
+        this.y = mod(this.y, HEIGHT);
 
+        this.shoot(dt);
     }
 }
 
 var plr = new Player();
+objects.push(plr);
 
 function load() {
     document.body.addEventListener("keydown", onKeydown);
@@ -124,16 +126,33 @@ function onKeyup(key) {
     input[key] = false;
 }
 
-function draw() {
+function draw(dt) {
     ctx.clearRect(0, 0, WIDTH, canvas.height);
+    preEffects(dt);
     objects.forEach(function(e) {
         e.draw(ctx);
     });
+    postEffects(dt);
+}
+
+function preEffects() {
+    ctx.save();
+    if (screenShake > 0) {
+        ctx.translate(Math.random()*15 - 7.5, Math.random()*15 - 7.5);
+        screenShake--;
+    }
+}
+
+function postEffects() {
+    ctx.restore();
 }
 
 function update(dt) {
-    objects.forEach(function(e) {
-        e.move(dt);
+    objects.forEach(function(e, i) {
+        e.update(dt);
+
+        if (!e.active)
+            objects.splice(i, 1);
     });
 }
 
@@ -144,11 +163,8 @@ function update(dt) {
     var dt = now - lastUpdate;
     lastUpdate = now;
     
-    plr.move(dt, input);
-    plr.shoot(dt, input);
     update(dt);
-    draw();
-    plr.draw(ctx);
+    draw(dt);
 }());
 
 load();
